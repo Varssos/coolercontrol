@@ -7,10 +7,30 @@
   failed_when: false
   changed_when: false
 
-- name: Add CoolerControl repository via setup script
-  ansible.builtin.shell: >
-    curl -1sLf '{{ coolercontrol_setup_script_url }}' | bash
+- name: Ensure curl is installed (required for repository setup script)
+  ansible.builtin.apt:
+    name: curl
+    state: present
   become: true
+  when: coolercontrol_installed.rc != 0
+
+- name: Download CoolerControl repository setup script
+  ansible.builtin.get_url:
+    url: "{{ coolercontrol_setup_script_url }}"
+    dest: "/tmp/coolercontrol-setup.sh"
+    mode: '0700'
+  become: true
+  when: coolercontrol_installed.rc != 0
+
+- name: Run CoolerControl repository setup script
+  ansible.builtin.command: /tmp/coolercontrol-setup.sh
+  become: true
+  when: coolercontrol_installed.rc != 0
+
+- name: Remove CoolerControl repository setup script
+  ansible.builtin.file:
+    path: "/tmp/coolercontrol-setup.sh"
+    state: absent
   when: coolercontrol_installed.rc != 0
 
 - name: Install CoolerControl

@@ -6,7 +6,6 @@ Ansible role to install and configure [CoolerControl](https://gitlab.com/coolerc
 
 - Debian or Ubuntu host
 - `become: true` privileges (sudo)
-- `curl` available on the target host
 
 ## Role Variables
 
