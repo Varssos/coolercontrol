@@ -1,0 +1,29 @@
+---
+# Based on: https://docs.coolercontrol.org/installation/debian.html
+
+- name: Check if CoolerControl is already installed
+  ansible.builtin.command: dpkg-query -W {{ coolercontrol_package_name }}
+  register: coolercontrol_installed
+  failed_when: false
+  changed_when: false
+
+- name: Add CoolerControl repository via setup script
+  ansible.builtin.shell: >
+    curl -1sLf '{{ coolercontrol_setup_script_url }}' | bash
+  become: true
+  when: coolercontrol_installed.rc != 0
+
+- name: Install CoolerControl
+  ansible.builtin.apt:
+    name: "{{ coolercontrol_package_name }}"
+    state: present
+    update_cache: true
+  become: true
+  when: coolercontrol_installed.rc != 0
+
+- name: Enable and start CoolerControl daemon
+  ansible.builtin.systemd:
+    name: "{{ coolercontrol_service_name }}"
+    enabled: true
+    state: started
+  become: true

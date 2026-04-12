@@ -1,0 +1,4 @@
+# coolercontrol
+coolercontrol_package_name: "coolercontrol"
+coolercontrol_service_name: "coolercontrold"
+coolercontrol_setup_script_url: "https://dl.cloudsmith.io/public/coolercontrol/coolercontrol/setup.deb.sh"
