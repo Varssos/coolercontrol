@@ -14,11 +14,30 @@
   become: true
   when: coolercontrol_installed.rc != 0
 
+- name: Download CoolerControl repository setup script
+  ansible.builtin.get_url:
+    url: "{{ coolercontrol_setup_script_url }}"
+    dest: /tmp/coolercontrol_setup.sh
+    mode: "0700"
+    timeout: 30
+  become: true
+  when: coolercontrol_installed.rc != 0
+
 - name: Add CoolerControl repository via setup script
-  ansible.builtin.shell: >
-    curl -1sLf '{{ coolercontrol_setup_script_url }}' | bash
+  ansible.builtin.shell: /tmp/coolercontrol_setup.sh
   become: true
   changed_when: true
+  async: 120
+  poll: 10
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when: coolercontrol_installed.rc != 0
+
+- name: Remove CoolerControl setup script
+  ansible.builtin.file:
+    path: /tmp/coolercontrol_setup.sh
+    state: absent
+  become: true
   when: coolercontrol_installed.rc != 0
 
 - name: Install CoolerControl
